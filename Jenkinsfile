@@ -1,47 +1,26 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs "NodeJS" // configure NodeJS in Jenkins global tools if using ESLint etc.
-    }
-
-    environment {
-        SONARQUBE = 'SonarQubeServer' // name of SonarQube server in Jenkins config
-    }
-
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
+                echo 'Cloning code...'
                 checkout scm
-            }
-        }
-
-        stage('Code Quality - SonarQube') {
-            steps {
-                script {
-                    withSonarQubeEnv("${env.SONARQUBE}") {
-                        sh '''
-                          sonar-scanner \
-                          -Dsonar.projectKey=todo-app \
-                          -Dsonar.sources=. \
-                          -Dsonar.host.url=http://sonarqube:9000 \
-                          -Dsonar.login=admin \
-                          -Dsonar.password=admin
-                        '''
-                    }
-                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t todo-app .'
+                script {
+                    dockerImage = docker.build("todo-app-image")
+                }
             }
         }
 
-        stage('Run App Container') {
+        stage('Run Docker Compose') {
             steps {
-                sh 'docker run -d -p 8080:80 --name todo-app todo-app'
+                sh 'docker-compose down || true'
+                sh 'docker-compose up -d --build'
             }
         }
     }
