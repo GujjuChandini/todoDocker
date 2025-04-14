@@ -1,11 +1,14 @@
-# Use Nginx as base image to serve static files
+# Use Nginx as base image
 FROM nginx:alpine
 
-# Copy app files into nginx's html directory
+# Remove default nginx html content
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy your app content to nginx folder
 COPY . /usr/share/nginx/html
 
-# Expose default port
+# Expose port 80
 EXPOSE 80
 
-# Start Nginx server
+# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
