@@ -1,24 +1,27 @@
 pipeline {
     agent any
 
-    environment {
-        REPO_URL = 'https://github.com/GujjuChandini/todoDocker.git'
-    }
-
     stages {
         stage('Clone Repository') {
             steps {
-                echo 'Cloning source code...'
-                git branch: 'main', url: "${REPO_URL}"
+                echo 'Cloning the GitHub repository...'
+                git url: 'https://github.com/GujjuChandini/todoDocker.git'
             }
         }
 
-        stage('Build and Run Docker Compose') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Stopping old containers (if any)...'
+                script {
+                    echo 'Building Docker image...'
+                    dockerImage = docker.build("todo-app-image")
+                }
+            }
+        }
+
+        stage('Run Docker Compose') {
+            steps {
+                echo 'Running Docker Compose...'
                 sh 'docker-compose down || true'
-                
-                echo 'Building and starting new containers...'
                 sh 'docker-compose up -d --build'
             }
         }
