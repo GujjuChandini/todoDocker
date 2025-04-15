@@ -1,11 +1,24 @@
 pipeline {
     agent any
 
+    environment {
+        SONARQUBE_URL = 'http://localhost:9000'
+        SONAR_SCANNER_HOME = tool 'SonarScanner' // Configure in Jenkins > Global Tool Config
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
-                echo 'Cloning code...'
+                echo 'Cloning repository...'
                 checkout scm
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=TodoApp -Dsonar.sources=."
+                }
             }
         }
 
