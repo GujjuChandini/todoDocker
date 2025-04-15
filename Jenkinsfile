@@ -8,24 +8,17 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                echo 'Cloning code...'
+                echo 'Cloning source code...'
                 git branch: 'main', url: "${REPO_URL}"
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build and Run Docker Compose') {
             steps {
-                script {
-                    echo 'Building Docker image...'
-                    sh 'docker build -t todo-app-image .'
-                }
-            }
-        }
-
-        stage('Run Docker Compose') {
-            steps {
-                echo 'Running Docker Compose...'
+                echo 'Stopping old containers (if any)...'
                 sh 'docker-compose down || true'
+                
+                echo 'Building and starting new containers...'
                 sh 'docker-compose up -d --build'
             }
         }
