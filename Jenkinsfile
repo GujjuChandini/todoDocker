@@ -5,7 +5,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 echo 'Cloning the GitHub repository...'
-                git url: 'https://github.com/GujjuChandini/todoDocker.git'
+                git url: 'https://github.com/GujjuChandini/todoDocker.git', branch: 'main'
             }
         }
 
